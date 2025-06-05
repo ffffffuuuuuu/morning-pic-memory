@@ -40,7 +40,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 600px;
             width: 90%;
             background: rgba(255, 255, 255, 0.9);
             padding: 2rem;
@@ -812,8 +812,8 @@
         }
 
         function showSuccessPage() {
-            // 設置大標題：答對了！第X關完成
-            successTitle.textContent = `答對了！第 ${currentLevel} 關完成`;
+            // 設置大標題：答對了！第X關完成！ + emoji
+            successTitle.textContent = `🎉 答對了！第 ${currentLevel} 關完成！`;
             
             // 隨機選擇激勵語
             const randomMessage = motivationalMessages[Math.floor(Math.random() * motivationalMessages.length)];
