@@ -107,26 +107,25 @@
             position: fixed;
             bottom: 20px;
             right: 20px;
-            padding: 0.5rem 1rem; /* 減小padding */
+            padding: 0.5rem 1rem;
             border: none;
             border-radius: var(--border-radius);
-            font-size: 16px; /* 調整字體大小 */
+            font-size: 16px;
             cursor: pointer;
             transition: var(--transition);
             box-shadow: var(--box-shadow);
             background-color: #FFA500;
             color: white;
-            white-space: nowrap; /* 防止文字換行 */
-            overflow: hidden; /* 隱藏溢出的文字 */
-            text-overflow: ellipsis; /* 如果文字溢出，顯示省略號 */
-            max-width: 120px; /* 設置最大寬度 */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 120px;
         }
 
-        /* 為小螢幕設備添加媒體查詢 */
         @media (max-width: 600px) {
             .btn-answer-fixed {
-                font-size: 14px; /* 在小螢幕上進一步縮小字體 */
-                padding: 0.4rem 0.8rem; /* 在小螢幕上減小padding */
+                font-size: 14px;
+                padding: 0.4rem 0.8rem;
             }
         }
 
@@ -175,7 +174,7 @@
         }
 
         .chat-container {
-            max-height: 500px; /* 調整這裡可以改變對話框的最大高度 */
+            max-height: 500px;
             overflow-y: auto;
             border: 1px solid #ddd;
             border-radius: var(--border-radius);
@@ -250,10 +249,45 @@
             display: flex;
             justify-content: center;
             margin-top: 2rem;
+            gap: 1rem;
         }
 
-        .result-actions .btn {
-            display: none;
+        .question-progress {
+            text-align: center;
+            color: var(--light-text-color);
+            margin-bottom: 1rem;
+            font-size: 16px;
+        }
+
+        .animal-badge {
+            text-align: center;
+            font-size: 48px;
+            margin: 1rem 0;
+        }
+
+        .animal-title {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .warning-section {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .warning-section h3 {
+            color: #856404;
+            margin-bottom: 1rem;
+        }
+
+        .warning-section p {
+            color: #856404;
+            margin-bottom: 1rem;
         }
 
         @keyframes fadeIn {
@@ -278,6 +312,10 @@
                 width: 100%;
                 margin-bottom: 0.5rem;
             }
+
+            .result-actions {
+                flex-direction: column;
+            }
         }
 
         #background {
@@ -293,7 +331,6 @@
             width: 100%;
             height: 100%;
         }
-
     </style>
 </head>
 <body>
@@ -308,6 +345,18 @@
                 <button class="btn btn-primary" id="start-btn">開始挑戰</button>
             </div>
         </section>
+        
+        <section class="game-section" id="warning">
+            <div class="warning-section">
+                <h3>⚠️ 注意！</h3>
+                <p>從第七關開始，每一關可能會有<strong>多個問題</strong>要回答！</p>
+                <p>請做好心理準備，仔細觀察對話內容的每個細節。</p>
+            </div>
+            <div class="button-container">
+                <button class="btn btn-primary" id="continue-btn">我準備好了！</button>
+            </div>
+        </section>
+        
         <section class="game-section" id="game">
             <div class="chat-container" id="chat-container">
                 <!-- 對話內容將由 JavaScript 動態生成 -->
@@ -320,29 +369,38 @@
                 </div>
             </div>
         </section>
+        
         <section class="game-section" id="quiz">
+            <div class="question-progress" id="question-progress"></div>
             <h2 class="question-title">請問：</h2>
             <p class="question-text" id="question"></p>
             <div class="answer-grid" id="answer-grid">
                 <!-- 選項將由 JavaScript 動態生成 -->
             </div>
         </section>
+        
         <section class="game-section" id="result">
             <h2 class="result-title" id="result-message">恭喜你，答對了！</h2>
+            <div class="animal-badge" id="animal-badge"></div>
+            <h3 class="animal-title" id="animal-title"></h3>
             <div class="result-actions">
                 <button class="btn btn-secondary" id="next-btn">下一關</button>
-                <button class="btn btn-primary" id="restart-btn">重新開始</button>
+                <button class="btn btn-primary" id="retry-btn">重新挑戰本關</button>
             </div>
         </section>
+        
         <section class="game-section" id="end">
             <h2>恭喜全部完成！</h2>
-            <p id="total-passed">你將 <span id="passed-count"></span> 個關卡都答對了，記憶力超群！</p>
+            <div class="animal-badge" id="final-animal-badge"></div>
+            <h3 class="animal-title" id="final-animal-title"></h3>
+            <p id="total-passed">你成功通過了 <span id="passed-count"></span> 關，記憶力超群！</p>
             <div class="button-container">
                 <button class="btn btn-primary" id="restart-btn-end">重新開始</button>
             </div>
         </section>
     </main>
     <button class="btn btn-answer-fixed" id="answer-btn">直接作答</button>
+    
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script> 
     <script>
         let gameConfig;
@@ -352,18 +410,39 @@
         let currentQuestionIndex = 0;
 
         const introSection = document.getElementById('intro');
+        const warningSection = document.getElementById('warning');
         const gameSection = document.getElementById('game');
         const quizSection = document.getElementById('quiz');
         const resultSection = document.getElementById('result');
         const endSection = document.getElementById('end');
         const startBtn = document.getElementById('start-btn');
+        const continueBtn = document.getElementById('continue-btn');
         const nextBtn = document.getElementById('next-btn');
-        const restartBtn = document.getElementById('restart-btn');
+        const retryBtn = document.getElementById('retry-btn');
         const restartBtnEnd = document.getElementById('restart-btn-end');
         const questionEl = document.getElementById('question');
+        const questionProgress = document.getElementById('question-progress');
         const resultMessageEl = document.getElementById('result-message');
         const passedCountEl = document.getElementById('passed-count');
         const answerBtn = document.getElementById('answer-btn');
+        const animalBadge = document.getElementById('animal-badge');
+        const animalTitle = document.getElementById('animal-title');
+        const finalAnimalBadge = document.getElementById('final-animal-badge');
+        const finalAnimalTitle = document.getElementById('final-animal-title');
+
+        // 動物等級系統
+        const animalLevels = [
+            { min: 0, max: 0, emoji: '🐠', name: '記憶金魚' },
+            { min: 1, max: 2, emoji: '🐰', name: '機靈小兔' },
+            { min: 3, max: 4, emoji: '🐱', name: '聰慧小貓' },
+            { min: 5, max: 6, emoji: '🦊', name: '智慧小狐' },
+            { min: 7, max: 8, emoji: '🦉', name: '博學貓頭鷹' },
+            { min: 9, max: 10, emoji: '🐬', name: '超智海豚' }
+        ];
+
+        function getAnimalByLevel(level) {
+            return animalLevels.find(animal => level >= animal.min && level <= animal.max) || animalLevels[0];
+        }
 
         particlesJS('particles-js', {
             particles: {
@@ -377,17 +456,21 @@
         });
 
         startBtn.addEventListener('click', startGame);
+        continueBtn.addEventListener('click', () => {
+            showSection(gameSection);
+            loadLevel(currentLevel);
+            startTimer();
+        });
         nextBtn.addEventListener('click', nextLevel);
-        restartBtn.addEventListener('click', restartGame);
+        retryBtn.addEventListener('click', retryCurrentLevel);
         restartBtnEnd.addEventListener('click', restartGame);
-        answerBtn.style.display = 'none'; // 初始隐藏按钮
+        answerBtn.style.display = 'none';
 
         function showSection(section) {
-            [introSection, gameSection, quizSection, resultSection, endSection].forEach(s => s.style.display = 'none');
+            [introSection, warningSection, gameSection, quizSection, resultSection, endSection].forEach(s => s.style.display = 'none');
             section.style.display = 'block';
             section.classList.add('fade-in');
 
-            // 只有在显示“gameSection”（看对话页面）时显示“作答”按钮
             if (section === gameSection) {
                 answerBtn.style.display = 'block';
             } else {
@@ -396,8 +479,8 @@
         }
 
         answerBtn.addEventListener('click', function() {
-            clearInterval(timer); // 停止计时器
-            showSection(quizSection); // 直接显示作答页面
+            clearInterval(timer);
+            showSection(quizSection);
         });
 
         async function startGame() {
@@ -417,10 +500,8 @@
             let color = '#';
             for (let i = 0; i < 6; i++) {
                 if (i % 2 === 0) {
-                    // 生成範圍在0-7之間的數字，以確保顏色較深
                     color += letters[Math.floor(Math.random() * 8)];
                 } else {
-                    // 生成範圍在8-F之間的數字
                     color += letters[Math.floor(Math.random() * 8 + 8)];
                 }
             }
@@ -464,6 +545,15 @@
         function loadQuestion() {
             const levelConfig = gameConfig[currentLevel];
             const currentQuestion = levelConfig.questions[currentQuestionIndex];
+            const totalQuestions = levelConfig.questions.length;
+
+            // 顯示題目進度
+            if (totalQuestions > 1) {
+                questionProgress.textContent = `第 ${currentQuestionIndex + 1}/${totalQuestions} 題`;
+                questionProgress.style.display = 'block';
+            } else {
+                questionProgress.style.display = 'none';
+            }
 
             questionEl.textContent = currentQuestion.question;
             const answerGrid = document.getElementById('answer-grid');
@@ -527,17 +617,33 @@
         }
 
         function showResult(isCorrect) {
-            resultMessageEl.textContent = isCorrect ? 
-                `恭喜你，答對了！你已成功通過 ${passedLevels} 關。` : 
-                `答錯了，但是別灰心，你已通過 ${passedLevels} 關，再試一次吧！`;
-            nextBtn.style.display = isCorrect ? 'block' : 'none';
-            restartBtn.style.display = isCorrect ? 'none' : 'block';
+            const animal = getAnimalByLevel(passedLevels);
+            animalBadge.textContent = animal.emoji;
+            animalTitle.textContent = animal.name;
+            
+            if (isCorrect) {
+                resultMessageEl.textContent = `恭喜你，答對了！你已成功通過 ${passedLevels} 關。`;
+                nextBtn.style.display = 'block';
+                retryBtn.style.display = 'none';
+            } else {
+                resultMessageEl.textContent = `答錯了，但是別灰心！你目前通過了 ${passedLevels} 關。`;
+                nextBtn.style.display = 'none';
+                retryBtn.style.display = 'block';
+            }
+            
             showSection(resultSection);
         }
 
         function nextLevel() {
             currentLevel++;
             currentQuestionIndex = 0;
+            
+            // 在第七關前顯示警告
+            if (currentLevel === 7) {
+                showSection(warningSection);
+                return;
+            }
+            
             if (gameConfig[currentLevel]) {
                 showSection(gameSection);
                 loadLevel(currentLevel);
@@ -547,7 +653,17 @@
             }
         }
 
+        function retryCurrentLevel() {
+            currentQuestionIndex = 0;
+            showSection(gameSection);
+            loadLevel(currentLevel);
+            startTimer();
+        }
+
         function showEndScreen() {
+            const animal = getAnimalByLevel(passedLevels);
+            finalAnimalBadge.textContent = animal.emoji;
+            finalAnimalTitle.textContent = animal.name;
             passedCountEl.textContent = passedLevels;
             showSection(endSection);
         }
