@@ -40,7 +40,7 @@
         }
 
         .container {
-            max-width: 600px;
+            max-width: 800px;
             width: 90%;
             background: rgba(255, 255, 255, 0.9);
             padding: 2rem;
@@ -372,6 +372,8 @@
         .success-section {
             text-align: center;
             padding: 2rem 1rem;
+            max-width: 600px;
+            margin: 0 auto;
         }
 
         .success-title {
@@ -812,7 +814,7 @@
         }
 
         function showSuccessPage() {
-            // 設置大標題：答對了！第X關完成！ + emoji
+            // 設置大標題：🎉 答對了！第X關完成！
             successTitle.textContent = `🎉 答對了！第 ${currentLevel} 關完成！`;
             
             // 隨機選擇激勵語
