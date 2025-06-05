@@ -450,6 +450,17 @@
             </div>
         </section>
         
+        <section class="game-section" id="success">
+            <div class="success-section">
+                <div class="success-emoji">🎉</div>
+                <h2 class="success-title">太棒了！答對了！</h2>
+                <p class="progress-text" id="progress-text">第 1 關完成！</p>
+                <div class="button-container">
+                    <button class="btn btn-primary" id="continue-next-btn">繼續挑戰</button>
+                </div>
+            </div>
+        </section>
+        
         <section class="game-section" id="result">
             <h2 class="result-title" id="result-message">恭喜你，答對了！</h2>
             <div class="animal-card" id="animal-card">
@@ -588,6 +599,7 @@
             loadLevel(currentLevel);
             startTimer();
         });
+        continueNextBtn.addEventListener('click', nextLevel);
         retryBtn.addEventListener('click', retryCurrentLevel);
         resetBtn.addEventListener('click', () => {
             if (confirm('確定要重新開始嗎？這會從第一關重新開始，目前的進度將會清除。')) {
@@ -598,7 +610,7 @@
         answerBtn.style.display = 'none';
 
         function showSection(section) {
-            [introSection, warningSection, gameSection, quizSection, resultSection, endSection].forEach(s => s.style.display = 'none');
+            [introSection, warningSection, gameSection, quizSection, successSection, resultSection, endSection].forEach(s => s.style.display = 'none');
             section.style.display = 'block';
             section.classList.add('fade-in');
 
@@ -753,8 +765,9 @@
 
         function showResult(isCorrect) {
             if (isCorrect) {
-                // 答對直接進入下一關，不顯示動物卡片
-                nextLevel();
+                // 答對顯示慶祝頁面
+                progressText.textContent = `第 ${currentLevel} 關完成！`;
+                showSection(successSection);
                 return;
             }
             
