@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>誰傳了那張早安圖？</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4A90E2;
+            --secondary-color: #F5A623;
+            --background-color: #F8F9FA;
+            --text-color: #333333;
+            --light-text-color: #666666;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+            --font-size-default: 18px;
+            --font-size-title: 35px;
+            --font-size-button: 20px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            font-size: var(--font-size-default);
+        }
+
+        .container {
+            max-width: 800px;
+            width: 90%;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        h1, h2 {
+            font-family: 'Montserrat', sans-serif;
+            margin-bottom: 1rem;
+        }
+
+        .title {
+            font-size: var(--font-size-title);
+            color: var(--primary-color);
+            text-align: center;
+        }
+
+        .description {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: var(--font-size-button);
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--box-shadow);
+            color: white;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background-color: #357ABD;
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #E59500;
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-answer {
+            background-color: #FFA500;
+        }
+
+        .btn-answer:hover {
+            background-color: #ff822e;
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-answer-fixed {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 0.5rem 1rem; /* 減小padding */
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 16px; /* 調整字體大小 */
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--box-shadow);
+            background-color: #FFA500;
+            color: white;
+            white-space: nowrap; /* 防止文字換行 */
+            overflow: hidden; /* 隱藏溢出的文字 */
+            text-overflow: ellipsis; /* 如果文字溢出，顯示省略號 */
+            max-width: 120px; /* 設置最大寬度 */
+        }
+
+        /* 為小螢幕設備添加媒體查詢 */
+        @media (max-width: 600px) {
+            .btn-answer-fixed {
+                font-size: 14px; /* 在小螢幕上進一步縮小字體 */
+                padding: 0.4rem 0.8rem; /* 在小螢幕上減小padding */
+            }
+        }
+
+        .btn-answer-fixed:hover {
+            background-color: #ff822e;
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .game-section {
+            display: none;
+        }
+
+        .timer-wrapper {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .timer-label {
+            margin-right: 10px;
+            font-size: var(--font-size-default);
+            color: var(--text-color);
+        }
+
+        .timer-container {
+            flex-grow: 1;
+            height: 20px;
+            background-color: #ddd;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .timer-bar {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 1s linear, background-color 1s linear;
+        }
+
+        .timer-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #000;
+            font-weight: bold;
+        }
+
+        .chat-container {
+            max-height: 500px; /* 調整這裡可以改變對話框的最大高度 */
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            background-color: #7AC5CD;
+        }
+
+        .chat-message {
+            display: flex;
+            margin-bottom: 1rem;
+        }
+
+        .chat-message.left {
+            justify-content: flex-start;
+        }
+
+        .chat-message.right {
+            justify-content: flex-end;
+        }
+
+        .chat-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .chat-message.right .chat-avatar {
+            margin-right: 0;
+            margin-left: 1rem;
+        }
+
+        .chat-content {
+            background-color: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            max-width: 70%;
+        }
+
+        .chat-message.right .chat-content {
+            background-color: #95EC69;
+        }
+
+        .chat-image {
+            width: 100%;
+            height: auto;
+            max-width: 300px;
+            border-radius: var(--border-radius);
+            margin-top: 0.5rem;
+        }
+
+        .answer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .result-actions {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .result-actions .btn {
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @media (max-width: 600px) {
+            .title {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .btn {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+        }
+
+        #background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        #particles-js {
+            width: 100%;
+            height: 100%;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="background">
+        <div id="particles-js"></div>
+    </div>
+    <main class="container">
+        <section class="game-section" id="intro">
+            <h1 class="title">誰傳了那張早安圖？</h1>
+            <p class="description">準備好挑戰你的記憶力了嗎？在時限內記住群組對話中的早安圖和內容，然後回答問題。</p>
+            <div class="button-container">
+                <button class="btn btn-primary" id="start-btn">開始挑戰</button>
+            </div>
+        </section>
+        <section class="game-section" id="game">
+            <div class="chat-container" id="chat-container">
+                <!-- 對話內容將由 JavaScript 動態生成 -->
+            </div>
+            <div class="timer-wrapper">
+                <span class="timer-label">剩餘時間：</span>
+                <div class="timer-container">
+                    <div class="timer-bar" id="timer-bar"></div>
+                    <div class="timer-text" id="timer-text"></div>
+                </div>
+            </div>
+        </section>
+        <section class="game-section" id="quiz">
+            <h2 class="question-title">請問：</h2>
+            <p class="question-text" id="question"></p>
+            <div class="answer-grid" id="answer-grid">
+                <!-- 選項將由 JavaScript 動態生成 -->
+            </div>
+        </section>
+        <section class="game-section" id="result">
+            <h2 class="result-title" id="result-message">恭喜你，答對了！</h2>
+            <div class="result-actions">
+                <button class="btn btn-secondary" id="next-btn">下一關</button>
+                <button class="btn btn-primary" id="restart-btn">重新開始</button>
+            </div>
+        </section>
+        <section class="game-section" id="end">
+            <h2>恭喜全部完成！</h2>
+            <p id="total-passed">你將 <span id="passed-count"></span> 個關卡都答對了，記憶力超群！</p>
+            <div class="button-container">
+                <button class="btn btn-primary" id="restart-btn-end">重新開始</button>
+            </div>
+        </section>
+    </main>
+    <button class="btn btn-answer-fixed" id="answer-btn">直接作答</button>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script> 
+    <script>
+        let gameConfig;
+        let currentLevel = 1;
+        let passedLevels = 0;
+        let timer;
+        let currentQuestionIndex = 0;
+
+        const introSection = document.getElementById('intro');
+        const gameSection = document.getElementById('game');
+        const quizSection = document.getElementById('quiz');
+        const resultSection = document.getElementById('result');
+        const endSection = document.getElementById('end');
+        const startBtn = document.getElementById('start-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const restartBtnEnd = document.getElementById('restart-btn-end');
+        const questionEl = document.getElementById('question');
+        const resultMessageEl = document.getElementById('result-message');
+        const passedCountEl = document.getElementById('passed-count');
+        const answerBtn = document.getElementById('answer-btn');
+
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 80 },
+                color: { value: '#4A90E2' },
+                shape: { type: 'circle' },
+                opacity: { value: 0.5, random: false },
+                size: { value: 3, random: true },
+                move: { enable: true, speed: 1 }
+            }
+        });
+
+        startBtn.addEventListener('click', startGame);
+        nextBtn.addEventListener('click', nextLevel);
+        restartBtn.addEventListener('click', restartGame);
+        restartBtnEnd.addEventListener('click', restartGame);
+        answerBtn.style.display = 'none'; // 初始隐藏按钮
+
+        function showSection(section) {
+            [introSection, gameSection, quizSection, resultSection, endSection].forEach(s => s.style.display = 'none');
+            section.style.display = 'block';
+            section.classList.add('fade-in');
+
+            // 只有在显示“gameSection”（看对话页面）时显示“作答”按钮
+            if (section === gameSection) {
+                answerBtn.style.display = 'block';
+            } else {
+                answerBtn.style.display = 'none';
+            }
+        }
+
+        answerBtn.addEventListener('click', function() {
+            clearInterval(timer); // 停止计时器
+            showSection(quizSection); // 直接显示作答页面
+        });
+
+        async function startGame() {
+            gameConfig = await fetchGameConfig();
+            showSection(gameSection);
+            loadLevel(currentLevel);
+            startTimer();
+        }
+
+        async function fetchGameConfig() {
+            const response = await fetch('gameConfig.json');
+            return await response.json();
+        }
+
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                if (i % 2 === 0) {
+                    // 生成範圍在0-7之間的數字，以確保顏色較深
+                    color += letters[Math.floor(Math.random() * 8)];
+                } else {
+                    // 生成範圍在8-F之間的數字
+                    color += letters[Math.floor(Math.random() * 8 + 8)];
+                }
+            }
+            return color;
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function loadLevel(level) {
+            const levelConfig = gameConfig[level];
+            currentQuestionIndex = 0;
+
+            const chatContainer = document.getElementById('chat-container');
+            chatContainer.innerHTML = levelConfig.conversations.map(conv => generateChatMessage(conv)).join('');
+            loadQuestion();
+        }
+
+        function generateChatMessage(conv) {
+            const alignmentClass = conv.alignment === 'right' ? 'right' : 'left';
+            const chatColor = conv.alignment === 'right' ? '#95EC69' : '#fff';
+            const avatarHtml = conv.alignment !== 'right' ? 
+                `<div class="chat-avatar" style="background-color: ${getRandomColor()}">${conv.sender}</div>` : '';
+
+            return `
+                <div class="chat-message ${alignmentClass}">
+                    ${avatarHtml}
+                    <div class="chat-content" style="background-color: ${chatColor}">
+                        <p>${conv.content}</p>
+                        ${conv.image ? `<img src="${conv.image}" alt="早安圖" class="chat-image">` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function loadQuestion() {
+            const levelConfig = gameConfig[currentLevel];
+            const currentQuestion = levelConfig.questions[currentQuestionIndex];
+
+            questionEl.textContent = currentQuestion.question;
+            const answerGrid = document.getElementById('answer-grid');
+            const shuffledOptions = shuffleArray([...currentQuestion.options]);
+            answerGrid.innerHTML = shuffledOptions.map(option => `
+                <button class="btn btn-answer" data-answer="${option}">${option}</button>
+            `).join('');
+
+            document.querySelectorAll('.btn-answer').forEach(btn => {
+                btn.addEventListener('click', () => checkAnswer(btn.dataset.answer));
+            });
+        }
+
+        function startTimer() {
+            let timeLeft = gameConfig[currentLevel].timeLimit;
+            updateTimerDisplay(timeLeft);
+            timer = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay(timeLeft);
+                if (timeLeft < 0) {
+                    clearInterval(timer);
+                    showSection(quizSection);
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay(timeLeft) {
+            const total = gameConfig[currentLevel].timeLimit;
+            const widthPercentage = (timeLeft / total) * 100;
+            const timerBar = document.getElementById('timer-bar');
+            const timerText = document.getElementById('timer-text');
+
+            timerBar.style.width = `${widthPercentage}%`;
+            timerText.textContent = `${timeLeft}秒`;
+
+            if (timeLeft > total * 0.66) {
+                timerBar.style.backgroundColor = `#4CAF50`;
+            } else if (timeLeft > total * 0.33) {
+                timerBar.style.backgroundColor = `#FFC107`;
+            } else {
+                timerBar.style.backgroundColor = `#F44336`;
+            }
+        }
+
+        function checkAnswer(answer) {
+            const levelConfig = gameConfig[currentLevel];
+            const currentQuestion = levelConfig.questions[currentQuestionIndex];
+            const isCorrect = answer === currentQuestion.answer;
+
+            if (isCorrect) {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < levelConfig.questions.length) {
+                    loadQuestion();
+                } else {
+                    passedLevels++;
+                    showResult(true);
+                }
+            } else {
+                showResult(false);
+            }
+        }
+
+        function showResult(isCorrect) {
+            resultMessageEl.textContent = isCorrect ? 
+                `恭喜你，答對了！你已成功通過 ${passedLevels} 關。` : 
+                `答錯了，但是別灰心，你已通過 ${passedLevels} 關，再試一次吧！`;
+            nextBtn.style.display = isCorrect ? 'block' : 'none';
+            restartBtn.style.display = isCorrect ? 'none' : 'block';
+            showSection(resultSection);
+        }
+
+        function nextLevel() {
+            currentLevel++;
+            currentQuestionIndex = 0;
+            if (gameConfig[currentLevel]) {
+                showSection(gameSection);
+                loadLevel(currentLevel);
+                startTimer();
+            } else {
+                showEndScreen();
+            }
+        }
+
+        function showEndScreen() {
+            passedCountEl.textContent = passedLevels;
+            showSection(endSection);
+        }
+
+        function restartGame() {
+            currentLevel = 1;
+            currentQuestionIndex = 0;
+            passedLevels = 0;
+            showSection(introSection);
+        }
+
+        showSection(introSection);
+    </script>
+</body>
+</html>
