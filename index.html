@@ -107,25 +107,26 @@
             position: fixed;
             bottom: 20px;
             right: 20px;
-            padding: 0.5rem 1rem;
+            padding: 0.5rem 1rem; /* 減小padding */
             border: none;
             border-radius: var(--border-radius);
-            font-size: 16px;
+            font-size: 16px; /* 調整字體大小 */
             cursor: pointer;
             transition: var(--transition);
             box-shadow: var(--box-shadow);
             background-color: #FFA500;
             color: white;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 120px;
+            white-space: nowrap; /* 防止文字換行 */
+            overflow: hidden; /* 隱藏溢出的文字 */
+            text-overflow: ellipsis; /* 如果文字溢出，顯示省略號 */
+            max-width: 120px; /* 設置最大寬度 */
         }
 
+        /* 為小螢幕設備添加媒體查詢 */
         @media (max-width: 600px) {
             .btn-answer-fixed {
-                font-size: 14px;
-                padding: 0.4rem 0.8rem;
+                font-size: 14px; /* 在小螢幕上進一步縮小字體 */
+                padding: 0.4rem 0.8rem; /* 在小螢幕上減小padding */
             }
         }
 
@@ -174,7 +175,7 @@
         }
 
         .chat-container {
-            max-height: 500px;
+            max-height: 500px; /* 調整這裡可以改變對話框的最大高度 */
             overflow-y: auto;
             border: 1px solid #ddd;
             border-radius: var(--border-radius);
@@ -255,40 +256,6 @@
             display: none;
         }
 
-        /* 新增：數據顯示區域 */
-        .stats-section {
-            background: #f0f0f0;
-            padding: 1rem;
-            border-radius: var(--border-radius);
-            margin-top: 1rem;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 1rem;
-            border-radius: var(--border-radius);
-            text-align: center;
-            box-shadow: var(--box-shadow);
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-
-        .stat-label {
-            font-size: 0.9rem;
-            color: var(--light-text-color);
-        }
-
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -326,6 +293,7 @@
             width: 100%;
             height: 100%;
         }
+
     </style>
 </head>
 <body>
@@ -369,146 +337,19 @@
         <section class="game-section" id="end">
             <h2>恭喜全部完成！</h2>
             <p id="total-passed">你將 <span id="passed-count"></span> 個關卡都答對了，記憶力超群！</p>
-            
-            <!-- 新增：遊戲數據統計 -->
-            <div class="stats-section">
-                <h3>🎮 你的遊戲數據</h3>
-                <div class="stats-grid" id="final-stats">
-                    <!-- 統計數據會在這裡顯示 -->
-                </div>
-            </div>
-            
             <div class="button-container">
                 <button class="btn btn-primary" id="restart-btn-end">重新開始</button>
-                <button class="btn btn-secondary" id="export-data-btn">匯出數據</button>
             </div>
         </section>
     </main>
     <button class="btn btn-answer-fixed" id="answer-btn">直接作答</button>
-    
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script> 
     <script>
-        // === 遊戲數據追蹤系統 ===
-        class GameAnalytics {
-            constructor() {
-                this.gameData = {
-                    sessionId: this.generateSessionId(),
-                    startTime: Date.now(),
-                    levels: {},
-                    totalScore: 0,
-                    gameStartTime: null,
-                    gameEndTime: null
-                };
-            }
-
-            generateSessionId() {
-                return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            }
-
-            recordGameStart() {
-                this.gameData.gameStartTime = Date.now();
-            }
-
-            recordLevelStart(levelNumber) {
-                this.gameData.levels[levelNumber] = {
-                    startTime: Date.now(),
-                    observationStartTime: Date.now(),
-                    observationEndTime: null,
-                    answerStartTime: null,
-                    answerEndTime: null,
-                    completed: false,
-                    score: 0,
-                    attempts: (this.gameData.levels[levelNumber]?.attempts || 0) + 1
-                };
-            }
-
-            recordObservationEnd(levelNumber) {
-                if (this.gameData.levels[levelNumber]) {
-                    this.gameData.levels[levelNumber].observationEndTime = Date.now();
-                    this.gameData.levels[levelNumber].answerStartTime = Date.now();
-                }
-            }
-
-            recordAnswer(levelNumber, isCorrect) {
-                const level = this.gameData.levels[levelNumber];
-                if (level) {
-                    level.answerEndTime = Date.now();
-                    level.completed = isCorrect;
-                    
-                    if (isCorrect) {
-                        level.score = this.calculateScore(level);
-                        this.gameData.totalScore += level.score;
-                    }
-                }
-            }
-
-            calculateScore(level) {
-                const baseScore = 100;
-                const observationTime = (level.observationEndTime - level.observationStartTime) / 1000;
-                const answerTime = (level.answerEndTime - level.answerStartTime) / 1000;
-                
-                const timeBonus = Math.max(0, (15 - observationTime) * 3);
-                const speedBonus = Math.max(0, (10 - answerTime) * 2);
-                
-                return Math.round(baseScore + timeBonus + speedBonus);
-            }
-
-            recordGameEnd() {
-                this.gameData.gameEndTime = Date.now();
-            }
-
-            generateFinalStats() {
-                const levels = Object.keys(this.gameData.levels);
-                const completedLevels = levels.filter(level => 
-                    this.gameData.levels[level].completed
-                );
-                
-                const totalGameTime = this.gameData.gameEndTime - this.gameData.gameStartTime;
-                const avgObservationTime = this.getAverageObservationTime(completedLevels);
-                const avgAnswerTime = this.getAverageAnswerTime(completedLevels);
-
-                return {
-                    completedLevels: completedLevels.length,
-                    totalLevels: levels.length,
-                    completionRate: ((completedLevels.length / levels.length) * 100).toFixed(1),
-                    totalScore: this.gameData.totalScore,
-                    avgScore: completedLevels.length > 0 ? (this.gameData.totalScore / completedLevels.length).toFixed(1) : 0,
-                    totalTime: (totalGameTime / 1000).toFixed(1),
-                    avgObservationTime: avgObservationTime.toFixed(1),
-                    avgAnswerTime: avgAnswerTime.toFixed(1)
-                };
-            }
-
-            getAverageObservationTime(completedLevels) {
-                if (completedLevels.length === 0) return 0;
-                const total = completedLevels.reduce((sum, level) => {
-                    const levelData = this.gameData.levels[level];
-                    return sum + (levelData.observationEndTime - levelData.observationStartTime);
-                }, 0);
-                return total / completedLevels.length / 1000;
-            }
-
-            getAverageAnswerTime(completedLevels) {
-                if (completedLevels.length === 0) return 0;
-                const total = completedLevels.reduce((sum, level) => {
-                    const levelData = this.gameData.levels[level];
-                    return sum + (levelData.answerEndTime - levelData.answerStartTime);
-                }, 0);
-                return total / completedLevels.length / 1000;
-            }
-
-            exportData() {
-                return JSON.stringify(this.gameData, null, 2);
-            }
-        }
-
-        // === 原有的遊戲變數 ===
         let gameConfig;
         let currentLevel = 1;
         let passedLevels = 0;
         let timer;
         let currentQuestionIndex = 0;
-        let analytics = new GameAnalytics(); // 新增：數據追蹤實例
 
         const introSection = document.getElementById('intro');
         const gameSection = document.getElementById('game');
@@ -519,7 +360,6 @@
         const nextBtn = document.getElementById('next-btn');
         const restartBtn = document.getElementById('restart-btn');
         const restartBtnEnd = document.getElementById('restart-btn-end');
-        const exportDataBtn = document.getElementById('export-data-btn');
         const questionEl = document.getElementById('question');
         const resultMessageEl = document.getElementById('result-message');
         const passedCountEl = document.getElementById('passed-count');
@@ -540,14 +380,14 @@
         nextBtn.addEventListener('click', nextLevel);
         restartBtn.addEventListener('click', restartGame);
         restartBtnEnd.addEventListener('click', restartGame);
-        exportDataBtn.addEventListener('click', exportGameData); // 新增
-        answerBtn.style.display = 'none';
+        answerBtn.style.display = 'none'; // 初始隐藏按钮
 
         function showSection(section) {
             [introSection, gameSection, quizSection, resultSection, endSection].forEach(s => s.style.display = 'none');
             section.style.display = 'block';
             section.classList.add('fade-in');
 
+            // 只有在显示“gameSection”（看对话页面）时显示“作答”按钮
             if (section === gameSection) {
                 answerBtn.style.display = 'block';
             } else {
@@ -556,52 +396,20 @@
         }
 
         answerBtn.addEventListener('click', function() {
-            clearInterval(timer);
-            analytics.recordObservationEnd(currentLevel); // 新增：記錄觀察結束時間
-            showSection(quizSection);
+            clearInterval(timer); // 停止计时器
+            showSection(quizSection); // 直接显示作答页面
         });
 
         async function startGame() {
             gameConfig = await fetchGameConfig();
-            analytics.recordGameStart(); // 新增：記錄遊戲開始
             showSection(gameSection);
             loadLevel(currentLevel);
             startTimer();
         }
 
         async function fetchGameConfig() {
-            // 模擬載入配置，實際使用時請替換為真實的 JSON 檔案
-            return {
-                "1": {
-                    "conversations": [
-                        { "sender": "張三", "content": "大家好！"},
-                        { "sender": "李四", "content": "早安！秋天到了！", "image": "MorningPic/MorningPic_063.jpg" }
-                    ],
-                    "questions": [
-                        {
-                            "question": "李四傳的圖片中包含什麼？",
-                            "options": ["彩虹", "兔子", "道路"],
-                            "answer": "道路"
-                        }
-                    ],
-                    "timeLimit": 15
-                },
-                "2": {
-                    "conversations": [
-                        { "sender": "王五", "content": "早上好！新的一天加油！", "image": "MorningPic/MorningPic_038.jpg" },
-                        { "sender": "趙錢", "content": "早安！祝大家工作順利！"},
-                        { "sender": "孫李", "content": "祝小張出遊平安。"}
-                    ],
-                    "questions": [
-                        {
-                            "question": "王五傳的圖片中包含什麼？",
-                            "options": ["小船", "錢幣", "花朵"],
-                            "answer": "小船"
-                        }
-                    ],
-                    "timeLimit": 15
-                }
-            };
+            const response = await fetch('gameConfig.json');
+            return await response.json();
         }
 
         function getRandomColor() {
@@ -609,8 +417,10 @@
             let color = '#';
             for (let i = 0; i < 6; i++) {
                 if (i % 2 === 0) {
+                    // 生成範圍在0-7之間的數字，以確保顏色較深
                     color += letters[Math.floor(Math.random() * 8)];
                 } else {
+                    // 生成範圍在8-F之間的數字
                     color += letters[Math.floor(Math.random() * 8 + 8)];
                 }
             }
@@ -628,7 +438,6 @@
         function loadLevel(level) {
             const levelConfig = gameConfig[level];
             currentQuestionIndex = 0;
-            analytics.recordLevelStart(level); // 新增：記錄關卡開始
 
             const chatContainer = document.getElementById('chat-container');
             chatContainer.innerHTML = levelConfig.conversations.map(conv => generateChatMessage(conv)).join('');
@@ -676,7 +485,6 @@
                 updateTimerDisplay(timeLeft);
                 if (timeLeft < 0) {
                     clearInterval(timer);
-                    analytics.recordObservationEnd(currentLevel); // 新增：記錄觀察結束時間
                     showSection(quizSection);
                 }
             }, 1000);
@@ -704,8 +512,6 @@
             const levelConfig = gameConfig[currentLevel];
             const currentQuestion = levelConfig.questions[currentQuestionIndex];
             const isCorrect = answer === currentQuestion.answer;
-            
-            analytics.recordAnswer(currentLevel, isCorrect); // 新增：記錄答題結果
 
             if (isCorrect) {
                 currentQuestionIndex++;
@@ -742,66 +548,14 @@
         }
 
         function showEndScreen() {
-            analytics.recordGameEnd(); // 新增：記錄遊戲結束
             passedCountEl.textContent = passedLevels;
-            displayFinalStats(); // 新增：顯示最終統計
             showSection(endSection);
-        }
-
-        // 新增：顯示最終統計數據
-        function displayFinalStats() {
-            const stats = analytics.generateFinalStats();
-            const finalStatsContainer = document.getElementById('final-stats');
-            
-            finalStatsContainer.innerHTML = `
-                <div class="stat-card">
-                    <div class="stat-number">${stats.completedLevels}/${stats.totalLevels}</div>
-                    <div class="stat-label">完成關卡</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">${stats.completionRate}%</div>
-                    <div class="stat-label">完成率</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">${stats.totalScore}</div>
-                    <div class="stat-label">總分</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">${stats.avgScore}</div>
-                    <div class="stat-label">平均分數</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">${stats.totalTime}s</div>
-                    <div class="stat-label">總遊戲時間</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">${stats.avgObservationTime}s</div>
-                    <div class="stat-label">平均觀察時間</div>
-                </div>
-            `;
-        }
-
-        // 新增：匯出遊戲數據
-        function exportGameData() {
-            const data = analytics.exportData();
-            const blob = new Blob([data], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `game_data_${Date.now()}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            alert('遊戲數據已匯出！這份數據可以用來分析遊戲表現。');
         }
 
         function restartGame() {
             currentLevel = 1;
             currentQuestionIndex = 0;
             passedLevels = 0;
-            analytics = new GameAnalytics(); // 新增：重置數據追蹤
             showSection(introSection);
         }
 
