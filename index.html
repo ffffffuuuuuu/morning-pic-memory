@@ -259,16 +259,87 @@
             font-size: 16px;
         }
 
-        .animal-badge {
+        .animal-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 1.5rem 0;
             text-align: center;
-            font-size: 48px;
-            margin: 1rem 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .animal-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+            100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+        }
+
+        .animal-badge {
+            font-size: 64px;
+            margin-bottom: 1rem;
+            display: block;
+            position: relative;
+            z-index: 2;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
         }
 
         .animal-title {
-            text-align: center;
-            color: var(--primary-color);
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
             margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 2;
+        }
+
+        .animal-description {
+            color: rgba(255,255,255,0.9);
+            font-size: 16px;
+            font-style: italic;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .animal-progress {
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            height: 8px;
+            margin: 1rem auto;
+            width: 80%;
+            overflow: hidden;
+            position: relative;
+            z-index: 2;
+        }
+
+        .animal-level-text {
+            color: rgba(255,255,255,0.8);
+            font-size: 14px;
+            margin-top: 1rem;
+            position: relative;
+            z-index: 2;
+            min-height: 20px;
         }
 
         .warning-section {
@@ -381,8 +452,15 @@
         
         <section class="game-section" id="result">
             <h2 class="result-title" id="result-message">恭喜你，答對了！</h2>
-            <div class="animal-badge" id="animal-badge"></div>
-            <h3 class="animal-title" id="animal-title"></h3>
+            <div class="animal-card" id="animal-card">
+                <div class="animal-badge" id="animal-badge"></div>
+                <h3 class="animal-title" id="animal-title"></h3>
+                <p class="animal-description" id="animal-description"></p>
+                <div class="animal-progress">
+                    <div class="animal-progress-bar" id="animal-progress-bar"></div>
+                </div>
+                <p class="animal-level-text" id="animal-level-text"></p>
+            </div>
             <div class="result-actions">
                 <button class="btn btn-secondary" id="next-btn">下一關</button>
                 <button class="btn btn-primary" id="retry-btn">重新挑戰本關</button>
@@ -391,8 +469,15 @@
         
         <section class="game-section" id="end">
             <h2>恭喜全部完成！</h2>
-            <div class="animal-badge" id="final-animal-badge"></div>
-            <h3 class="animal-title" id="final-animal-title"></h3>
+            <div class="animal-card" id="final-animal-card">
+                <div class="animal-badge" id="final-animal-badge"></div>
+                <h3 class="animal-title" id="final-animal-title"></h3>
+                <p class="animal-description" id="final-animal-description"></p>
+                <div class="animal-progress">
+                    <div class="animal-progress-bar" id="final-animal-progress-bar"></div>
+                </div>
+                <p class="animal-level-text" id="final-animal-level-text"></p>
+            </div>
             <p id="total-passed">你成功通過了 <span id="passed-count"></span> 關，記憶力超群！</p>
             <div class="button-container">
                 <button class="btn btn-primary" id="restart-btn-end">重新開始</button>
@@ -427,21 +512,104 @@
         const answerBtn = document.getElementById('answer-btn');
         const animalBadge = document.getElementById('animal-badge');
         const animalTitle = document.getElementById('animal-title');
+        const animalDescription = document.getElementById('animal-description');
+        const animalCard = document.getElementById('animal-card');
+        const animalProgressBar = document.getElementById('animal-progress-bar');
+        const animalLevelText = document.getElementById('animal-level-text');
         const finalAnimalBadge = document.getElementById('final-animal-badge');
         const finalAnimalTitle = document.getElementById('final-animal-title');
+        const finalAnimalDescription = document.getElementById('final-animal-description');
+        const finalAnimalCard = document.getElementById('final-animal-card');
+        const finalAnimalProgressBar = document.getElementById('final-animal-progress-bar');
+        const finalAnimalLevelText = document.getElementById('final-animal-level-text');
 
         // 動物等級系統
         const animalLevels = [
-            { min: 0, max: 0, emoji: '🐠', name: '記憶金魚' },
-            { min: 1, max: 2, emoji: '🐰', name: '機靈小兔' },
-            { min: 3, max: 4, emoji: '🐱', name: '聰慧小貓' },
-            { min: 5, max: 6, emoji: '🦊', name: '智慧小狐' },
-            { min: 7, max: 8, emoji: '🦉', name: '博學貓頭鷹' },
-            { min: 9, max: 10, emoji: '🐬', name: '超智海豚' }
+            { 
+                min: 0, max: 0, 
+                emoji: '🐠', 
+                name: '記憶金魚', 
+                description: '3秒記憶，但你很可愛！',
+                color: '#FF6B6B'
+            },
+            { 
+                min: 1, max: 2, 
+                emoji: '🐰', 
+                name: '機靈小兔', 
+                description: '蹦蹦跳跳的記憶力！',
+                color: '#4ECDC4'
+            },
+            { 
+                min: 3, max: 4, 
+                emoji: '🐱', 
+                name: '聰慧小貓', 
+                description: '優雅且聰明的觀察者',
+                color: '#45B7D1'
+            },
+            { 
+                min: 5, max: 6, 
+                emoji: '🦊', 
+                name: '智慧小狐', 
+                description: '狡黠機智，細節高手！',
+                color: '#F39C12'
+            },
+            { 
+                min: 7, max: 8, 
+                emoji: '🦉', 
+                name: '博學貓頭鷹', 
+                description: '夜間智者，洞察一切！',
+                color: '#8E44AD'
+            },
+            { 
+                min: 9, max: 10, 
+                emoji: '🐬', 
+                name: '超智海豚', 
+                description: '記憶大師，海洋之王！',
+                color: '#2ECC71'
+            }
         ];
 
-        function getAnimalByLevel(level) {
-            return animalLevels.find(animal => level >= animal.min && level <= animal.max) || animalLevels[0];
+        function updateAnimalDisplay(element, animal, passedLevels, isMainResult = true) {
+            const badge = element.querySelector('.animal-badge');
+            const title = element.querySelector('.animal-title');
+            const description = element.querySelector('.animal-description');
+            const progressBar = element.querySelector('.animal-progress-bar');
+            const levelText = element.querySelector('.animal-level-text');
+            
+            badge.textContent = animal.emoji;
+            title.textContent = animal.name;
+            description.textContent = animal.description;
+            
+            // 設置卡片顏色
+            element.style.background = `linear-gradient(135deg, ${animal.color} 0%, ${animal.color}88 100%)`;
+            
+            // 計算進度條
+            const progressInCurrentLevel = ((passedLevels - animal.min) / (animal.max - animal.min + 1)) * 100;
+            const finalProgress = Math.min(100, Math.max(0, progressInCurrentLevel));
+            
+            // 動畫效果
+            setTimeout(() => {
+                progressBar.style.width = `${finalProgress}%`;
+            }, 500);
+            
+            // 等級文字
+            if (passedLevels === animal.max && passedLevels < 10) {
+                levelText.textContent = `等級滿了！準備進化 🌟`;
+                levelText.style.color = '#FFD700';
+                levelText.style.fontWeight = 'bold';
+            } else if (passedLevels === 10) {
+                levelText.textContent = `記憶力大師！🏆`;
+                levelText.style.color = '#FFD700';
+                levelText.style.fontWeight = 'bold';
+            } else {
+                const nextLevel = animalLevels.find(a => a.min > passedLevels);
+                if (nextLevel) {
+                    const remaining = nextLevel.min - passedLevels;
+                    levelText.textContent = `再答對 ${remaining} 關升級為 ${nextLevel.emoji} ${nextLevel.name}`;
+                }
+                levelText.style.color = 'rgba(255,255,255,0.8)';
+                levelText.style.fontWeight = 'normal';
+            }
         }
 
         particlesJS('particles-js', {
@@ -616,20 +784,25 @@
             }
         }
 
+        function getAnimalByLevel(level) {
+            return animalLevels.find(animal => level >= animal.min && level <= animal.max) || animalLevels[0];
+        }
+
         function showResult(isCorrect) {
             const animal = getAnimalByLevel(passedLevels);
-            animalBadge.textContent = animal.emoji;
-            animalTitle.textContent = animal.name;
             
             if (isCorrect) {
-                resultMessageEl.textContent = `恭喜你，答對了！你已成功通過 ${passedLevels} 關。`;
+                resultMessageEl.textContent = `🎉 恭喜答對！你已成功通過 ${passedLevels} 關！`;
                 nextBtn.style.display = 'block';
                 retryBtn.style.display = 'none';
             } else {
-                resultMessageEl.textContent = `答錯了，但是別灰心！你目前通過了 ${passedLevels} 關。`;
+                resultMessageEl.textContent = `💪 答錯了，但是別灰心！你目前通過了 ${passedLevels} 關。`;
                 nextBtn.style.display = 'none';
                 retryBtn.style.display = 'block';
             }
+            
+            // 更新動物顯示
+            updateAnimalDisplay(animalCard, animal, passedLevels);
             
             showSection(resultSection);
         }
@@ -662,8 +835,10 @@
 
         function showEndScreen() {
             const animal = getAnimalByLevel(passedLevels);
-            finalAnimalBadge.textContent = animal.emoji;
-            finalAnimalTitle.textContent = animal.name;
+            
+            // 更新最終動物顯示
+            updateAnimalDisplay(finalAnimalCard, animal, passedLevels, false);
+            
             passedCountEl.textContent = passedLevels;
             showSection(endSection);
         }
