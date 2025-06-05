@@ -458,8 +458,8 @@
                 <p class="animal-description" id="animal-description"></p>
             </div>
             <div class="result-actions">
-                <button class="btn btn-primary" id="retry-btn">重新挑戰本關</button>
-                <button class="btn btn-reset" id="reset-btn">完全重新開始</button>
+                <button class="btn btn-reset" id="reset-btn">重新開始</button>
+                <button class="btn btn-retry" id="retry-btn">再次挑戰本關</button>
             </div>
         </section>
         
@@ -554,7 +554,7 @@
                 emoji: '🦉', 
                 name: '博學貓頭鷹', 
                 description: '完美記憶，智慧之王！',
-                color: '#9B59B6'
+                color: '#F1C40F'
             }
         ];
 
@@ -590,7 +590,7 @@
         });
         retryBtn.addEventListener('click', retryCurrentLevel);
         resetBtn.addEventListener('click', () => {
-            if (confirm('確定要完全重新開始嗎？這會從第一關重新開始，目前的進度將會清除。')) {
+            if (confirm('確定要重新開始嗎？這會從第一關重新開始，目前的進度將會清除。')) {
                 restartGame();
             }
         });
