@@ -74,6 +74,7 @@
             transition: var(--transition);
             box-shadow: var(--box-shadow);
             color: white;
+            text-decoration: none;
         }
 
         .btn-primary {
@@ -100,6 +101,34 @@
 
         .btn-answer:hover {
             background-color: #ff822e;
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-reset {
+            background-color: #95A5A6;
+            margin-right: 1rem;
+        }
+
+        .btn-reset:hover {
+            background-color: #7F8C8D;
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-retry {
+            background-color: #2980B9;
+        }
+
+        .btn-retry:hover {
+            background-color: #1F618D;
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-continue {
+            background-color: #27AE60;
+        }
+
+        .btn-continue:hover {
+            background-color: #1E8449;
             box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
         }
 
@@ -317,29 +346,8 @@
             color: rgba(255,255,255,0.9);
             font-size: 16px;
             font-style: italic;
-            margin-bottom: 1rem;
             position: relative;
             z-index: 2;
-        }
-
-        .animal-progress {
-            background: rgba(255,255,255,0.2);
-            border-radius: 10px;
-            height: 8px;
-            margin: 1rem auto;
-            width: 80%;
-            overflow: hidden;
-            position: relative;
-            z-index: 2;
-        }
-
-        .animal-level-text {
-            color: rgba(255,255,255,0.8);
-            font-size: 14px;
-            margin-top: 1rem;
-            position: relative;
-            z-index: 2;
-            min-height: 20px;
         }
 
         .warning-section {
@@ -359,6 +367,35 @@
         .warning-section p {
             color: #856404;
             margin-bottom: 1rem;
+        }
+
+        .success-section {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .success-icon {
+            font-size: 72px;
+            margin-bottom: 1rem;
+            animation: celebrate 1s ease-out;
+        }
+
+        @keyframes celebrate {
+            0% { transform: scale(0) rotate(0deg); }
+            50% { transform: scale(1.2) rotate(180deg); }
+            100% { transform: scale(1) rotate(360deg); }
+        }
+
+        .success-title {
+            font-size: 32px;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .progress-info {
+            font-size: 18px;
+            color: var(--light-text-color);
+            margin-bottom: 2rem;
         }
 
         @keyframes fadeIn {
@@ -452,17 +489,15 @@
         
         <section class="game-section" id="success">
             <div class="success-section">
-                <div class="success-emoji">🎉</div>
+                <div class="success-icon">🎉</div>
                 <h2 class="success-title">太棒了！答對了！</h2>
-                <p class="progress-text" id="progress-text">第 1 關完成！</p>
-                <div class="button-container">
-                    <button class="btn btn-primary" id="continue-next-btn">繼續挑戰</button>
-                </div>
+                <p class="progress-info" id="progress-info">第 1 關完成！</p>
+                <button class="btn btn-continue" id="continue-next-btn">繼續挑戰</button>
             </div>
         </section>
         
         <section class="game-section" id="result">
-            <h2 class="result-title" id="result-message">恭喜你，答對了！</h2>
+            <h2 class="result-title" id="result-message">答錯了，但是別灰心！</h2>
             <div class="animal-card" id="animal-card">
                 <div class="animal-badge" id="animal-badge"></div>
                 <h3 class="animal-title" id="animal-title"></h3>
@@ -497,30 +532,27 @@
         let timer;
         let currentQuestionIndex = 0;
 
+        // DOM 元素
         const introSection = document.getElementById('intro');
         const warningSection = document.getElementById('warning');
         const gameSection = document.getElementById('game');
         const quizSection = document.getElementById('quiz');
+        const successSection = document.getElementById('success');
         const resultSection = document.getElementById('result');
         const endSection = document.getElementById('end');
         const startBtn = document.getElementById('start-btn');
         const continueBtn = document.getElementById('continue-btn');
-        const nextBtn = document.getElementById('next-btn');
+        const continueNextBtn = document.getElementById('continue-next-btn');
         const retryBtn = document.getElementById('retry-btn');
         const resetBtn = document.getElementById('reset-btn');
         const restartBtnEnd = document.getElementById('restart-btn-end');
         const questionEl = document.getElementById('question');
         const questionProgress = document.getElementById('question-progress');
+        const progressInfo = document.getElementById('progress-info');
         const resultMessageEl = document.getElementById('result-message');
         const passedCountEl = document.getElementById('passed-count');
         const answerBtn = document.getElementById('answer-btn');
-        const animalBadge = document.getElementById('animal-badge');
-        const animalTitle = document.getElementById('animal-title');
-        const animalDescription = document.getElementById('animal-description');
         const animalCard = document.getElementById('animal-card');
-        const finalAnimalBadge = document.getElementById('final-animal-badge');
-        const finalAnimalTitle = document.getElementById('final-animal-title');
-        const finalAnimalDescription = document.getElementById('final-animal-description');
         const finalAnimalCard = document.getElementById('final-animal-card');
 
         // 動物等級系統
@@ -569,7 +601,11 @@
             }
         ];
 
-        function updateAnimalDisplay(element, animal, passedLevels, isMainResult = true) {
+        function getAnimalByLevel(level) {
+            return animalLevels.find(animal => level >= animal.min && level <= animal.max) || animalLevels[0];
+        }
+
+        function updateAnimalDisplay(element, animal) {
             const badge = element.querySelector('.animal-badge');
             const title = element.querySelector('.animal-title');
             const description = element.querySelector('.animal-description');
@@ -578,10 +614,10 @@
             title.textContent = animal.name;
             description.textContent = animal.description;
             
-            // 設置卡片顏色
             element.style.background = `linear-gradient(135deg, ${animal.color} 0%, ${animal.color}88 100%)`;
         }
 
+        // 粒子背景
         particlesJS('particles-js', {
             particles: {
                 number: { value: 80 },
@@ -593,6 +629,7 @@
             }
         });
 
+        // 事件監聽器
         startBtn.addEventListener('click', startGame);
         continueBtn.addEventListener('click', () => {
             showSection(gameSection);
@@ -609,6 +646,11 @@
         restartBtnEnd.addEventListener('click', restartGame);
         answerBtn.style.display = 'none';
 
+        answerBtn.addEventListener('click', function() {
+            clearInterval(timer);
+            showSection(quizSection);
+        });
+
         function showSection(section) {
             [introSection, warningSection, gameSection, quizSection, successSection, resultSection, endSection].forEach(s => s.style.display = 'none');
             section.style.display = 'block';
@@ -620,11 +662,6 @@
                 answerBtn.style.display = 'none';
             }
         }
-
-        answerBtn.addEventListener('click', function() {
-            clearInterval(timer);
-            showSection(quizSection);
-        });
 
         async function startGame() {
             gameConfig = await fetchGameConfig();
@@ -690,7 +727,6 @@
             const currentQuestion = levelConfig.questions[currentQuestionIndex];
             const totalQuestions = levelConfig.questions.length;
 
-            // 顯示題目進度
             if (totalQuestions > 1) {
                 questionProgress.textContent = `第 ${currentQuestionIndex + 1}/${totalQuestions} 題`;
                 questionProgress.style.display = 'block';
@@ -752,32 +788,23 @@
                     loadQuestion();
                 } else {
                     passedLevels++;
-                    showResult(true);
+                    showSuccessPage();
                 }
             } else {
                 showResult(false);
             }
         }
 
-        function getAnimalByLevel(level) {
-            return animalLevels.find(animal => level >= animal.min && level <= animal.max) || animalLevels[0];
+        function showSuccessPage() {
+            progressInfo.textContent = `第 ${currentLevel} 關完成！`;
+            showSection(successSection);
         }
 
         function showResult(isCorrect) {
-            if (isCorrect) {
-                // 答對顯示慶祝頁面
-                progressText.textContent = `第 ${currentLevel} 關完成！`;
-                showSection(successSection);
-                return;
-            }
-            
-            // 答錯才顯示動物卡片
             const animal = getAnimalByLevel(passedLevels);
             resultMessageEl.textContent = `💪 答錯了，但是別灰心！你目前通過了 ${passedLevels} 關。`;
             
-            // 更新動物顯示
-            updateAnimalDisplay(animalCard, animal, passedLevels);
-            
+            updateAnimalDisplay(animalCard, animal);
             showSection(resultSection);
         }
 
@@ -785,7 +812,6 @@
             currentLevel++;
             currentQuestionIndex = 0;
             
-            // 在第七關前顯示警告
             if (currentLevel === 7) {
                 showSection(warningSection);
                 return;
@@ -809,10 +835,7 @@
 
         function showEndScreen() {
             const animal = getAnimalByLevel(passedLevels);
-            
-            // 更新最終動物顯示
-            updateAnimalDisplay(finalAnimalCard, animal, passedLevels, false);
-            
+            updateAnimalDisplay(finalAnimalCard, animal);
             passedCountEl.textContent = passedLevels;
             showSection(endSection);
         }
