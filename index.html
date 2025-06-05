@@ -40,10 +40,10 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 700px;
             width: 90%;
             background: rgba(255, 255, 255, 0.9);
-            padding: 2rem;
+            padding: 1.5rem;
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
         }
@@ -371,22 +371,23 @@
 
         .success-section {
             text-align: center;
-            padding: 4rem 2rem;
+            padding: 3rem 1.5rem;
         }
 
         .success-title {
-            font-size: 36px;
+            font-size: 32px;
             font-weight: bold;
             color: #2C3E50;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
             line-height: 1.3;
         }
 
-        .progress-info {
-            font-size: 20px;
+        .success-subtitle {
+            font-size: 16px;
             color: var(--light-text-color);
-            margin-bottom: 3rem;
-            font-weight: 500;
+            margin-bottom: 2.5rem;
+            font-style: italic;
+            line-height: 1.4;
         }
 
         @keyframes fadeIn {
@@ -480,8 +481,8 @@
         
         <section class="game-section" id="success">
             <div class="success-section">
-                <h2 class="success-title" id="success-title">太棒了！答對了！🎉</h2>
-                <p class="progress-info" id="progress-info">第 1 關完成！</p>
+                <h2 class="success-title" id="success-title">答對了！第 1 關完成</h2>
+                <p class="success-subtitle" id="success-subtitle">繼續保持，你的記憶力很棒！</p>
                 <button class="btn btn-continue" id="continue-next-btn">繼續挑戰</button>
             </div>
         </section>
@@ -811,11 +812,13 @@
         }
 
         function showSuccessPage() {
-            // 隨機選擇慶祝文字
-            const randomMessage = successMessages[Math.floor(Math.random() * successMessages.length)];
-            successTitle.textContent = randomMessage;
+            // 設置大標題
+            successTitle.textContent = `答對了！第 ${currentLevel} 關完成`;
             
-            progressInfo.textContent = `第 ${currentLevel} 關完成！`;
+            // 隨機選擇激勵語
+            const randomMessage = motivationalMessages[Math.floor(Math.random() * motivationalMessages.length)];
+            successSubtitle.textContent = randomMessage;
+            
             showSection(successSection);
         }
 
