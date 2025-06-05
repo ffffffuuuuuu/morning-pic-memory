@@ -371,31 +371,78 @@
 
         .success-section {
             text-align: center;
-            padding: 2rem;
+            padding: 3rem 2rem;
         }
 
-        .success-icon {
-            font-size: 72px;
-            margin-bottom: 1rem;
-            animation: celebrate 1s ease-out;
+        .success-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0 auto 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: successPulse 2s ease-in-out infinite;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
         }
 
-        @keyframes celebrate {
-            0% { transform: scale(0) rotate(0deg); }
-            50% { transform: scale(1.2) rotate(180deg); }
-            100% { transform: scale(1) rotate(360deg); }
+        @keyframes successPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .success-checkmark {
+            width: 40px;
+            height: 40px;
+            border: 3px solid white;
+            border-radius: 50%;
+            position: relative;
+            animation: checkmarkDraw 1s ease-out;
+        }
+
+        .success-checkmark::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 12px;
+            border: 3px solid white;
+            border-top: none;
+            border-left: none;
+            transform: rotate(45deg);
+            top: 8px;
+            left: 12px;
+            animation: checkmarkAppear 0.5s ease-out 0.3s both;
+        }
+
+        @keyframes checkmarkDraw {
+            0% { transform: scale(0) rotate(180deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        @keyframes checkmarkAppear {
+            0% { opacity: 0; transform: rotate(45deg) scale(0); }
+            100% { opacity: 1; transform: rotate(45deg) scale(1); }
         }
 
         .success-title {
-            font-size: 32px;
-            color: var(--primary-color);
+            font-size: 28px;
+            font-weight: bold;
+            color: #2C3E50;
             margin-bottom: 1rem;
+            animation: textSlideIn 0.8s ease-out 0.5s both;
         }
 
         .progress-info {
-            font-size: 18px;
+            font-size: 16px;
             color: var(--light-text-color);
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
+            animation: textSlideIn 0.8s ease-out 0.7s both;
+        }
+
+        @keyframes textSlideIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes fadeIn {
@@ -489,8 +536,10 @@
         
         <section class="game-section" id="success">
             <div class="success-section">
-                <div class="success-icon">🎉</div>
-                <h2 class="success-title">太棒了！答對了！</h2>
+                <div class="success-circle">
+                    <div class="success-checkmark"></div>
+                </div>
+                <h2 class="success-title" id="success-title">太棒了！答對了！</h2>
                 <p class="progress-info" id="progress-info">第 1 關完成！</p>
                 <button class="btn btn-continue" id="continue-next-btn">繼續挑戰</button>
             </div>
@@ -549,11 +598,36 @@
         const questionEl = document.getElementById('question');
         const questionProgress = document.getElementById('question-progress');
         const progressInfo = document.getElementById('progress-info');
+        const successTitle = document.getElementById('success-title');
         const resultMessageEl = document.getElementById('result-message');
         const passedCountEl = document.getElementById('passed-count');
         const answerBtn = document.getElementById('answer-btn');
         const animalCard = document.getElementById('animal-card');
         const finalAnimalCard = document.getElementById('final-animal-card');
+
+        // 隨機慶祝文字庫
+        const successMessages = [
+            '太棒了！答對了！',
+            '厲害！記憶力超群！',
+            '完美答案！',
+            '你是天才！',
+            '觀察力一流！',
+            '眼力太好了！',
+            '太強了！',
+            '記憶大師！',
+            '專注力驚人！',
+            '無懈可擊！',
+            '神級表現！',
+            '細節達人！',
+            '腦力超群！',
+            '反應神速！',
+            '洞察力驚人！',
+            '精準無比！',
+            '火眼金睛！',
+            '一擊必中！',
+            '記憶王者！',
+            '超級棒！'
+        ];
 
         // 動物等級系統
         const animalLevels = [
@@ -796,6 +870,10 @@
         }
 
         function showSuccessPage() {
+            // 隨機選擇慶祝文字
+            const randomMessage = successMessages[Math.floor(Math.random() * successMessages.length)];
+            successTitle.textContent = randomMessage;
+            
             progressInfo.textContent = `第 ${currentLevel} 關完成！`;
             showSection(successSection);
         }
