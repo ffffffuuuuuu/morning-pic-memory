@@ -1,0 +1,178 @@
+{
+    "1": {
+        "conversations": [
+            { "sender": "張三", "content": "大家好！"},
+            { "sender": "李四", "content": "早安！秋天到了！", "image": "MorningPic/MorningPic_063.jpg" }
+        ],
+        "questions": [
+            {
+                "question": "李四傳的圖片中包含什麼？",
+                "options": ["彩虹", "兔子", "道路"],
+                "answer": "道路"
+            }
+        ],
+        "timeLimit": 15
+    },
+    "2": {
+        "conversations": [
+            { "sender": "王五", "content": "早上好！新的一天加油！", "image": "MorningPic/MorningPic_038.jpg" },
+            { "sender": "趙錢", "content": "早安！祝大家工作順利！"},
+            { "sender": "孫李", "content": "祝小張出遊平安。"}
+        ],
+        "questions": [
+            {
+                "question": "王五傳的圖片中包含什麼？",
+                "options": ["小船", "錢幣", "花朵"],
+                "answer": "小船"
+            }
+        ],
+        "timeLimit": 15
+    },
+    "3": {
+        "conversations": [
+            { "sender": "陳六", "content": "早安，週末愉快！", "image": "MorningPic/MorningPic_064.jpg" },
+            { "sender": "周七", "content": "新的一天開始了！", "image": "MorningPic/MorningPic_065.jpg" }
+        ],
+        "questions": [
+            {
+                "question": "周七所傳送的早安圖中，圖片背景為？",
+                "options": ["天空", "沙灘", "草地"],
+                "answer": "沙灘"
+            }
+        ],
+        "timeLimit": 15
+    },
+    "4": {
+        "conversations": [
+            { "sender": "吳九", "content": "祝大家今天開心！", "image": "MorningPic/MorningPic_007.jpg" },
+            { "sender": "楚十", "content": "早上好！", "image": "MorningPic/MorningPic_011.jpg" }
+        ],
+        "questions": [
+            {
+                "question": "楚十傳的圖片中包含什麼？",
+                "options": ["草地", "風車", "茶壺"],
+                "answer": "草地"
+            }
+        ],
+        "timeLimit": 15
+    },
+    "5": {
+        "conversations": [
+            { "sender": "吳一", "content": "早安！夏天到了！", "image": "MorningPic/MorningPic_002.jpg" },
+            { "sender": "鄭二", "content": "大家早上好！", "image": "MorningPic/MorningPic_026.jpg" },
+            { "sender": "王三", "content": "早安，週末愉快！", "image": "MorningPic/MorningPic_024.jpg" }
+        ],
+        "questions": [
+            {
+                "question": "鄭二傳的圖片中包含什麼？",
+                "options": ["腳踏車", "粽子", "貓咪"],
+                "answer": "貓咪"
+            }
+        ],
+        "timeLimit": 15
+    },
+    "6": {
+        "conversations": [
+            { "sender": "張強", "content": "早啊，有好夢嗎？", "image": "MorningPic/MorningPic_021.jpg" },
+            { "sender": "李偉", "content": "保持笑容！", "image": "MorningPic/MorningPic_013.jpg" },
+            { "sender": "王明", "content": "新的一天開始了！", "image": "MorningPic/MorningPic_023.jpg" }
+        ],
+        "questions": [
+            {
+                "question": "張強傳送的圖片中有什麼景物？",
+                "options": ["湖泊", "桌子", "荷花"],
+                "answer": "湖泊"
+            }
+        ],
+        "timeLimit": 15
+    },
+    "7": {
+        "conversations": [
+            { "sender": "林四", "content": "新的一周，加油！", "image": "MorningPic/MorningPic_027.jpg" },
+            { "sender": "楊平", "content": "又到了禮拜一，大家辛苦了。"},
+            { "sender": "胡五", "content": "早安，祝順利！", "image": "MorningPic/MorningPic_012.jpg" }
+        ],
+        "questions": [
+            {
+                "question": "林四所傳的圖片中包含什麼？",
+                "options": ["女孩", "向日葵", "玫瑰"],
+                "answer": "女孩"
+            },
+            {
+                "question": "從訊息中判斷，當天是星期幾？",
+                "options": ["星期一", "星期六", "星期三"],
+                "answer": "星期一"
+            }
+        ],
+        "timeLimit": 10
+    },
+    "8": {
+        "conversations": [
+        { "sender": "韓冬", "content": "冬天記得保暖！", "image": "MorningPic/MorningPic_049.jpg" },
+        { "sender": "蔣莉", "content": "早安，今天要去買菜嗎？", "image": "MorningPic/MorningPic_055.jpg" },
+        { "sender": "韓冬", "content": "有的。"},
+        { "sender": "黃濤", "content": "一起去吧。", "image": "MorningPic/MorningPic_030.jpg"}
+        ],
+        "questions": [
+            {
+                "question": "韓冬傳的圖片中有什麼動物？",
+                "options": ["孔雀", "小狗", "貓咪"],
+                "answer": "貓咪"
+            },
+            {
+                "question": "黃濤傳的圖片中包含什麼物品？",
+                "options": ["黃花", "雪人", "咖啡"],
+                "answer": "咖啡"
+            }
+        ],
+        "timeLimit": 10
+    },
+    "9": {
+        "conversations": [
+            { "sender": "余賈", "content": "早安，精神滿滿！", "image": "MorningPic/MorningPic_032.jpg" },
+            { "sender": "胡乙", "content": "大家早上好！今天我們討論一下週末計劃吧。"},
+            { "sender": "吳秉", "content": "早安，今天過得愉快！", "image": "MorningPic/MorningPic_016.jpg" },
+            { "sender": "高丁", "content": "我提議去踏青。" }
+        ],
+        "questions": [
+            {
+                "question": "余賈傳的圖片中有什麼？",
+                "options": ["荷花", "山脈", "日出"],
+                "answer": "荷花"
+            },
+            {
+                "question": "他們在對話中討論何事？",
+                "options": ["週末計畫", "天氣", "財務管理"],
+                "answer": "週末計畫"
+            }
+        ],
+        "timeLimit": 10
+    },
+    "10": {
+        "conversations": [
+            { "sender": "高彬", "content": "佳節愉快", "image": "MorningPic/MorningPic_058.jpg" },
+            { "sender": "何安", "content": "早上好，大家今天吃了什麼早餐？", "image": "MorningPic/MorningPic_062.jpg" },
+            { "sender": "劉楠", "content": "我吃了三明治，你呢？"},
+            { "sender": "徐峰", "content": "我只喝了咖啡。"},
+            { "sender": "趙丹", "content": "早上好，精神滿滿！", "image": "MorningPic/MorningPic_020.jpg" }
+        ],
+        "questions": [
+            {
+                "question": "此對話當時的季節為何？",
+                "options": ["夏天", "秋天", "春天"],
+                "answer": "夏天"
+            },
+            {
+                "question": "趙丹所傳的圖片中包含哪樣物品？",
+                "options": ["水管", "帽子", "招財貓"],
+                "answer": "招財貓"
+            },
+            {
+                "question": "劉楠早餐吃了什麼？",
+                "options": ["粽子", "三明治", "咖啡"],
+                "answer": "三明治"
+            }
+        ],
+        "timeLimit": 10
+    }
+}
